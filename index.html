@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Netflux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0b0f;
+      --panel:#121319;
+      --muted:#a0a3ad;
+      --text:#e9eaee;
+      --accent:#e50914;
+      --accent-2:#b20710;
+      --card:#181924;
+      --ring:rgba(255,255,255,.1);
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      background:radial-gradient(1200px 600px at 70% -10%, #1a1b25 0%, var(--bg) 60%),
+                 radial-gradient(700px 350px at -10% 30%, #131320 0%, transparent 70%),
+                 var(--bg);
+      font-family:"Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height:1.45;
+    }
+
+    /* Header */
+    .nav{
+      position:sticky; top:0; z-index:50;
+      display:flex; gap:16px; align-items:center; justify-content:space-between;
+      padding:14px 22px; backdrop-filter:saturate(140%) blur(8px);
+      background:linear-gradient(180deg, rgba(12,12,18,.9), rgba(12,12,18,.55) 70%, transparent);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .brand .logo{
+      width:28px; height:28px; border-radius:7px; background:linear-gradient(145deg, var(--accent), var(--accent-2));
+      display:grid; place-items:center; box-shadow:0 6px 20px rgba(229,9,20,.3);
+      font-weight:900; letter-spacing:.2px; font-size:16px;
+    }
+    .brand .name{font-weight:900; letter-spacing:.5px}
+
+    .search{
+      flex:1; max-width:560px; display:flex; gap:10px; align-items:center;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+      padding:10px 12px; border-radius:999px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .search input{
+      flex:1; background:transparent; border:0; color:var(--text); outline:none;
+      font-size:14px;
+    }
+    .pill{
+      border:1px solid rgba(255,255,255,.12); color:#fff; font-weight:600;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      padding:10px 14px; border-radius:999px; cursor:pointer; transition:.2s transform;
+    }
+    .pill:hover{transform:translateY(-1px)}
+
+    /* Hero */
+    .hero{
+      position:relative; border-radius:var(--radius); overflow:hidden; margin:16px 22px 10px;
+      min-height:48vh; display:grid; align-items:end; box-shadow:var(--shadow);
+      background:#10111a;
+    }
+    .hero img.bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:brightness(.65) saturate(1.15)}
+    .hero .veil{position:absolute; inset:0; background:radial-gradient(1200px 400px at 40% 0, rgba(16,17,26,0) 0, rgba(16,17,26,.6) 60%, rgba(16,17,26,.9) 100%)}
+    .hero .content{position:relative; padding:28px; max-width:720px}
+    .kicker{color:var(--muted); font-weight:600; letter-spacing:.18em; text-transform:uppercase; font-size:12px}
+    .title{font-size:clamp(28px, 4.6vw, 52px); font-weight:900; margin:6px 0 12px;}
+    .desc{color:#d6d7dd; max-width:60ch}
+    .actions{display:flex; gap:12px; margin-top:16px}
+    .btn{
+      display:inline-flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px;
+      background:#fff; color:#0d0e15; font-weight:800; border:0; cursor:pointer; box-shadow:var(--shadow);
+    }
+    .btn.secondary{background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.14)}
+
+    /* Rows */
+    .row{margin:26px 22px}
+    .row h3{margin:0 0 12px; font-size:18px}
+    .rail{display:grid; grid-auto-flow:column; grid-auto-columns:clamp(150px, 16vw, 220px); gap:14px; overflow-x:auto; padding-bottom:8px; scroll-snap-type:x mandatory}
+    .rail::-webkit-scrollbar{height:10px}
+    .rail::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12); border-radius:999px}
+    .card{
+      position:relative; aspect-ratio:2/3; border-radius:14px; overflow:hidden; background:var(--card);
+      scroll-snap-align:start; box-shadow:0 6px 20px rgba(0,0,0,.25); cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .card:hover{transform:translateY(-4px); box-shadow:0 18px 40px rgba(0,0,0,.35)}
+    .card img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+    .card .grad{position:absolute; inset:auto 0 0; height:60%; background:linear-gradient(180deg, transparent, rgba(0,0,0,.7) 50%, rgba(0,0,0,.9))}
+    .meta{position:absolute; left:10px; right:10px; bottom:10px; display:grid; gap:6px}
+    .tag{font-size:10px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:#d0d2db; opacity:.8}
+    .name{font-weight:800}
+
+    .badge{position:absolute; top:8px; left:8px; background:linear-gradient(145deg, var(--accent), var(--accent-2)); padding:6px 10px; border-radius:999px; font-size:10px; font-weight:900; letter-spacing:.12em}
+    .age{position:absolute; top:8px; right:8px; border:1px solid rgba(255,255,255,.4); padding:4px 8px; border-radius:999px; font-size:10px; font-weight:700; background:rgba(0,0,0,.35)}
+
+    /* Modal */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:100}
+    .modal.open{display:grid}
+    .sheet{width:min(1000px, 92vw); border-radius:18px; overflow:hidden; background:#0f1017; border:1px solid rgba(255,255,255,.08); box-shadow:0 40px 100px rgba(0,0,0,.5)}
+    .sheet .top{position:relative; aspect-ratio:16/9; background:#000}
+    .sheet iframe, .sheet video{position:absolute; inset:0; width:100%; height:100%}
+    .sheet .body{display:grid; gap:10px; padding:16px}
+    .sheet .title{font-size:22px}
+    .close{position:absolute; top:10px; right:10px; display:grid; place-items:center; width:36px; height:36px; border-radius:999px; border:1px solid rgba(255,255,255,.2); background:rgba(0,0,0,.35); cursor:pointer}
+
+    /* Footer */
+    footer{color:var(--muted); opacity:.9; padding:30px 22px 60px}
+
+    /* Utility */
+    .hide{display:none !important}
+
+    @media (max-width: 720px){
+      .desc{display:none}
+      .actions{flex-wrap:wrap}
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <div class="nav">
+    <div class="brand">
+      <div class="logo">N</div>
+      <div class="name">Netflux</div>
+    </div>
+    <div class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="search" placeholder="Search by title, year, tag…" />
+    </div>
+    <button id="loginBtn" class="pill">Sign in</button>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <img class="bg" id="heroBg" src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1600&auto=format&fit=crop" alt="Hero"/>
+    <div class="veil"></div>
+    <div class="content">
+      <div class="kicker" id="heroKicker">Original • Sci‑Fi</div>
+      <div class="title" id="heroTitle">Starlight Echoes</div>
+      <div class="desc" id="heroDesc">After a deep‑space accident, a rookie pilot must team up with a rogue AI to navigate a collapsing wormhole and find a way home.</div>
+      <div class="actions">
+        <button class="btn" id="heroPlay">▶ Play</button>
+        <button class="btn secondary" id="heroMore">ℹ More Info</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROWS -->
+  <div id="rows"></div>
+
+  <footer>Built with plain HTML/CSS/JS — no frameworks. Demo posters from Picsum/Unsplash.</footer>
+
+  <!-- VIDEO / INFO MODAL -->
+  <div class="modal" id="modal">
+    <div class="sheet">
+      <div class="top" id="modalTop">
+        <!-- Example: switch between video iframe or fallback image -->
+        <button class="close" id="closeModal" title="Close">✕</button>
+      </div>
+      <div class="body">
+        <div class="title" id="modalTitle">Title</div>
+        <div id="modalMeta" style="color:#b8bac4"></div>
+        <div id="modalDesc" style="color:#d6d7dd"></div>
+        <div style="display:flex; gap:10px; margin-top:6px">
+          <button class="pill" id="saveList">＋ My List</button>
+          <button class="pill" id="shareBtn">Share</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN MOCK MODAL (example of another modal) -->
+  <div class="modal" id="login">
+    <div class="sheet" style="max-width:520px">
+      <div class="body">
+        <div class="title">Sign in</div>
+        <div style="color:#b8bac4">Demo only — no backend needed. Use this to see how a form pop‑up could look.</div>
+        <form id="loginForm" style="display:grid; gap:10px; margin-top:10px">
+          <input required name="email" type="email" placeholder="Email" style="padding:12px; border-radius:12px; background:#11121a; border:1px solid rgba(255,255,255,.12); color:#fff">
+          <input required name="pass" type="password" placeholder="Password" style="padding:12px; border-radius:12px; background:#11121a; border:1px solid rgba(255,255,255,.12); color:#fff">
+          <button class="btn" type="submit">Sign in</button>
+          <button type="button" class="btn secondary" id="loginCancel">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================
+       1) Minimal fake catalog — replace with your API results
+       Each item shows how the UI uses data with examples.
+       ========================================================== */
+    const CATALOG = [
+      {
+        id: "starlight-echoes",
+        title: "Starlight Echoes",
+        year: 2024,
+        rating: "PG-13",
+        duration: 118,
+        tags: ["Sci‑Fi", "Original", "Space"],
+        category: "Trending Now",
+        img: "https://picsum.photos/seed/starlight/600/900",
+        hero: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1600&auto=format&fit=crop",
+        trailer: "https://www.youtube.com/embed/5PSNL1qE6VY?rel=0&autoplay=1&mute=1",
+        description: "A rookie pilot and a rogue AI navigate a collapsing wormhole."
+      },
+      {
+        id: "afterglow",
+        title: "Afterglow",
+        year: 2023,
+        rating: "16+",
+        duration: 101,
+        tags: ["Drama", "Award‑Winning"],
+        category: "Trending Now",
+        img: "https://picsum.photos/seed/afterglow/600/900",
+        trailer: null,
+        description: "A washed‑up musician returns home and finds a second act." 
+      },
+      {
+        id: "quantum-heist",
+        title: "Quantum Heist",
+        year: 2022,
+        rating: "PG-13",
+        duration: 129,
+        tags: ["Action", "Time"],
+        category: "Popular on Netflux",
+        img: "https://picsum.photos/seed/quantum/600/900",
+        trailer: "https://www.youtube.com/embed/YoHD9XEInc0?rel=0&autoplay=1&mute=1",
+        description: "Thieves who can pause time plan one last impossible job."
+      },
+      {
+        id: "lilypad",
+        title: "Lilypad Lane",
+        year: 2021,
+        rating: "7+",
+        duration: 92,
+        tags: ["Family", "Animation"],
+        category: "Kids & Family",
+        img: "https://picsum.photos/seed/lilypad/600/900",
+        trailer: null,
+        description: "A shy tadpole dreams of becoming a river ranger." 
+      },
+      {
+        id: "dark-signal",
+        title: "Dark Signal",
+        year: 2024,
+        rating: "18+",
+        duration: 110,
+        tags: ["Thriller", "Mystery"],
+        category: "Netflux Originals",
+        img: "https://picsum.photos/seed/darksignal/600/900",
+        trailer: "https://www.youtube.com/embed/EXeTwQWrcwY?rel=0&autoplay=1&mute=1",
+        description: "An investigative podcaster follows a signal into the woods." 
+      },
+      {
+        id: "paper-stars",
+        title: "Paper Stars",
+        year: 2020,
+        rating: "PG",
+        duration: 95,
+        tags: ["Romance", "Indie"],
+        category: "Popular on Netflux",
+        img: "https://picsum.photos/seed/paperstars/600/900",
+        trailer: null,
+        description: "Two strangers fold wishes into origami across a city."
+      },
+      {
+        id: "code-red",
+        title: "Code Red",
+        year: 2025,
+        rating: "13+",
+        duration: 114,
+        tags: ["Tech", "Thriller"],
+        category: "Trending Now",
+        img: "https://picsum.photos/seed/codered/600/900",
+        trailer: null,
+        description: "An intern discovers a backdoor that could crash the world." 
+      },
+      {
+        id: "the-depths",
+        title: "The Depths",
+        year: 2019,
+        rating: "PG-13",
+        duration: 108,
+        tags: ["Adventure"],
+        category: "Netflux Originals",
+        img: "https://picsum.photos/seed/depths/600/900",
+        trailer: null,
+        description: "Divers uncover a city lost beneath polar ice." 
+      }
+    ];
+
+    /* ==========================================================
+       2) Render rows from the catalog
+       Example: each category becomes a horizontal carousel.
+       ========================================================== */
+    const rowsEl = document.getElementById('rows');
+
+    function groupBy(xs, key){
+      return xs.reduce((acc, x) => ((acc[x[key]] = acc[x[key]] || []).push(x), acc), {});
+    }
+
+    function makeCard(item){
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.setAttribute('data-title', item.title.toLowerCase());
+      el.setAttribute('data-tags', item.tags.join(',').toLowerCase());
+      el.setAttribute('data-year', item.year);
+      el.innerHTML = `
+        <img loading="lazy" src="${item.img}" alt="${item.title}"/>
+        <span class="badge">${item.tags[0] || 'Title'}</span>
+        <span class="age">${item.rating}</span>
+        <div class="grad"></div>
+        <div class="meta">
+          <div class="tag">${item.year} • ${item.duration}m</div>
+          <div class="name">${item.title}</div>
+        </div>`;
+      el.addEventListener('click', () => openModal(item));
+      return el;
+    }
+
+    function renderRows(list){
+      rowsEl.innerHTML = '';
+      const groups = groupBy(list, 'category');
+      Object.entries(groups).forEach(([category, items]) =>{
+        const wrap = document.createElement('section');
+        wrap.className = 'row';
+        wrap.innerHTML = `<h3>${category}</h3><div class="rail"></div>`;
+        const rail = wrap.querySelector('.rail');
+        items.forEach(i => rail.appendChild(makeCard(i)));
+        rowsEl.appendChild(wrap);
+      });
+    }
+
+    renderRows(CATALOG);
+
+    /* ==========================================================
+       3) Live search filter
+       Example: type "2024" or "thriller" or a title.
+       ========================================================== */
+    const search = document.getElementById('search');
+    search.addEventListener('input', (e) =>{
+      const q = e.target.value.trim().toLowerCase();
+      if(!q){
+        renderRows(CATALOG);
+        return;
+      }
+      const filtered = CATALOG.filter(it =>
+        it.title.toLowerCase().includes(q) ||
+        it.tags.join(',').toLowerCase().includes(q) ||
+        String(it.year).includes(q)
+      );
+      renderRows(filtered.length ? filtered : []);
+      if(!filtered.length){
+        rowsEl.innerHTML = `<div style="padding:30px 22px; color:#c6c8d2">No matches for “${q}”. Try e.g. <b>thriller</b> or <b>2024</b>.</div>`;
+      }
+    });
+
+    /* ==========================================================
+       4) Hero wires
+       Example: Play opens trailer (YouTube if provided), More shows info.
+       Clicking a card also uses openModal(item).
+       ========================================================== */
+    const heroPlay = document.getElementById('heroPlay');
+    const heroMore = document.getElementById('heroMore');
+
+    const defaultHero = CATALOG[0];
+    hydrateHero(defaultHero);
+
+    function hydrateHero(item){
+      document.getElementById('heroBg').src = item.hero || item.img;
+      document.getElementById('heroKicker').textContent = `${item.tags[0] || 'Featured'} • ${item.tags[1] || item.category}`;
+      document.getElementById('heroTitle').textContent = item.title;
+      document.getElementById('heroDesc').textContent = item.description;
+      heroPlay.onclick = () => openModal(item, { play: true });
+      heroMore.onclick = () => openModal(item);
+    }
+
+    /* ==========================================================
+       5) Modal behavior (video or fallback image)
+       Example: if item.trailer exists, embed YouTube; else show poster.
+       Also demonstrates localStorage for “My List”.
+       ========================================================== */
+    const modal = document.getElementById('modal');
+    const modalTop = document.getElementById('modalTop');
+    const closeModalBtn = document.getElementById('closeModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMeta = document.getElementById('modalMeta');
+    const modalDesc = document.getElementById('modalDesc');
+    const saveListBtn = document.getElementById('saveList');
+    const shareBtn = document.getElementById('shareBtn');
+
+    function openModal(item, opts={}){
+      // reset top area
+      modalTop.innerHTML = '<button class="close" id="closeModal" title="Close">✕</button>';
+      const closeAgain = modalTop.querySelector('#closeModal');
+      closeAgain.addEventListener('click', () => closeModal());
+
+      if(item.trailer && (opts.play || false)){
+        const iframe = document.createElement('iframe');
+        iframe.src = item.trailer;
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+        iframe.setAttribute('allowfullscreen', 'true');
+        modalTop.appendChild(iframe);
+      } else {
+        const img = document.createElement('img');
+        img.src = item.img;
+        img.alt = item.title;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        modalTop.appendChild(img);
+      }
+
+      modalTitle.textContent = item.title;
+      modalMeta.textContent = `${item.year} • ${item.duration}m • ${item.rating} • ${item.tags.join(' / ')}`;
+      modalDesc.textContent = item.description;
+
+      saveListBtn.onclick = () => toggleMyList(item.id);
+      shareBtn.onclick = async () => {
+        const shareData = { title: item.title, text: `Watch ${item.title} on Netflux (demo)`, url: location.href + '#' + item.id };
+        try{
+          if(navigator.share){ await navigator.share(shareData); }
+          else { await navigator.clipboard.writeText(shareData.text + ' ' + shareData.url); alert('Link copied to clipboard!'); }
+        }catch(e){ console.log(e); }
+      }
+
+      modal.classList.add('open');
+    }
+
+    function closeModal(){
+      modal.classList.remove('open');
+      // Stop video playback by clearing modal top iframe
+      modalTop.innerHTML = '';
+    }
+
+    modal.addEventListener('click', (e)=>{
+      if(e.target === modal) closeModal();
+    });
+
+    // Simple My List using localStorage
+    function getMyList(){
+      try{ return JSON.parse(localStorage.getItem('mylist')||'[]'); }catch{ return []; }
+    }
+    function saveMyList(list){ localStorage.setItem('mylist', JSON.stringify(list)); }
+    function toggleMyList(id){
+      const list = new Set(getMyList());
+      if(list.has(id)) list.delete(id); else list.add(id);
+      saveMyList([...list]);
+      alert((list.has(id)?'Added to':'Removed from') + ' My List');
+    }
+
+    // Deep link: if URL has #id, open that title
+    window.addEventListener('load', () =>{
+      const id = location.hash.replace('#','');
+      const found = CATALOG.find(x => x.id === id);
+      if(found) openModal(found);
+    });
+
+    /* ==========================================================
+       6) Demo Sign-in modal (UI example)
+       ========================================================== */
+    const loginBtn = document.getElementById('loginBtn');
+    const loginModal = document.getElementById('login');
+    const loginCancel = document.getElementById('loginCancel');
+    const loginForm = document.getElementById('loginForm');
+
+    loginBtn.addEventListener('click', ()=> loginModal.classList.add('open'));
+    loginCancel.addEventListener('click', ()=> loginModal.classList.remove('open'));
+    loginModal.addEventListener('click', (e)=>{ if(e.target === loginModal) loginModal.classList.remove('open') });
+    loginForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(loginForm));
+      // Example: pretend auth success, store name
+      localStorage.setItem('netfluxUser', data.email);
+      loginModal.classList.remove('open');
+      alert(`Signed in as ${data.email}`);
+    });
+
+    /* ==========================================================
+       7) Example: How to plug in a real API later
+       ----------------------------------------------------------
+       Replace CATALOG with results from an API like TMDB and call
+       renderRows(newResults). Make sure each item has the shape
+       { id, title, year, rating, duration, tags[], category, img, trailer, description }
+       ========================================================== */
+  </script>
+</body>
+</html>
+
